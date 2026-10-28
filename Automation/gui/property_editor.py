@@ -1,0 +1,1 @@
+class PropertyEditor: pass

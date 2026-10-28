@@ -1,0 +1,8 @@
+{
+  "theme": "dark",
+  "hotkeys": {
+    "start": "F5",
+    "pause": "F6",
+    "stop": "F7"
+  }
+}
