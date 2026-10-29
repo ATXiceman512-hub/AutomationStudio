@@ -105,6 +105,29 @@ class MainWindow:
             self.monitor_window_state
         )
 
+<<<<<<< Updated upstream
+=======
+        self.root.bind(
+            "<Map>",
+            self.on_restore
+        )
+
+    def on_restore(self, event):
+
+        self.overlay.withdraw()
+
+    def on_minimize(self, event):
+
+        print("MINIMIZE EVENT")
+
+        print("STATE =", self.root.state())
+
+        if self.root.state() == "iconic":
+            print("SHOWING OVERLAY")
+
+            self.overlay.deiconify()
+
+>>>>>>> Stashed changes
     def log(self, message):
 
         timestamp = time.strftime(
