@@ -509,11 +509,25 @@ class MacroEditor(ctk.CTkFrame):
 
         result = selector.select()
 
-        root.deiconify()
+        root.after(
+            100,
+            root.deiconify
+        )
 
-        root.lift()
+        root.after(
+            150,
+            root.lift
+        )
 
-        root.focus_force()
+        root.after(
+            200,
+            lambda: root.attributes("-topmost", True)
+        )
+
+        root.after(
+            250,
+            lambda: root.attributes("-topmost", False)
+        )
 
         if not result:
             return
