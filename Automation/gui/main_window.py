@@ -7,6 +7,7 @@ from tkinter import filedialog
 from tkinter import END
 
 from gui.macro_editor import MacroEditor
+from gui.status_overlay import StatusOverlay
 
 from gui.images_tab import ImagesTab
 from gui.regions_tab import RegionsTab
@@ -59,6 +60,25 @@ class MainWindow:
         )
 
         self.build_ui()
+
+        self.root.bind(
+            "<Unmap>",
+            self.on_minimize
+        )
+
+        self.root.bind(
+            "<Map>",
+            self.on_restore
+        )
+
+    def on_restore(self, event):
+
+        self.overlay.withdraw()
+
+    def on_minimize(self, event):
+
+        if self.root.state() == "iconic":
+            self.overlay.deiconify()
 
     def log(self, message):
 
@@ -132,6 +152,10 @@ class MainWindow:
             self.action_var.set(
                 f"Action: {action_text}"
             )
+        )
+
+        self.overlay.action_label.configure(
+            text=action_text
         )
 
     def build_ui(self):
@@ -343,6 +367,12 @@ class MainWindow:
             padx=10
         )
 
+        self.overlay = StatusOverlay(
+            self.root
+        )
+
+        self.overlay.withdraw()
+
     def run_macro(self):
 
         macro = {
@@ -359,6 +389,10 @@ class MainWindow:
 
         self.log(
             "Macro Started"
+        )
+
+        self.overlay.status_label.configure(
+            text="✅ Running"
         )
 
     def update_timer(self):
@@ -405,6 +439,10 @@ class MainWindow:
             "Macro Stopped"
         )
 
+        self.overlay.status_label.configure(
+            text="⛔ Stopped"
+        )
+
     def pause_macro(self):
 
         self.engine.pause()
@@ -413,6 +451,10 @@ class MainWindow:
 
         self.status_var.set(
             "Paused"
+        )
+
+        self.overlay.status_label.configure(
+            text="⏸ Paused"
         )
 
     def resume_macro(self):
