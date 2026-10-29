@@ -105,13 +105,6 @@ class MainWindow:
             self.monitor_window_state
         )
 
-<<<<<<< Updated upstream
-=======
-        self.root.bind(
-            "<Map>",
-            self.on_restore
-        )
-
     def on_restore(self, event):
 
         self.overlay.withdraw()
@@ -127,7 +120,6 @@ class MainWindow:
 
             self.overlay.deiconify()
 
->>>>>>> Stashed changes
     def log(self, message):
 
         timestamp = time.strftime(
