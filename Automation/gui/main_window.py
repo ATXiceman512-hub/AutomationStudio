@@ -61,24 +61,49 @@ class MainWindow:
 
         self.build_ui()
 
-        self.root.bind(
-            "<Unmap>",
-            self.on_minimize
+        self.overlay_visible = False
+
+        self.monitor_window_state()
+
+    def monitor_window_state(self):
+
+        try:
+
+            is_minimized = (
+                    self.root.state() == "iconic"
+            )
+
+            if (
+                    is_minimized
+                    and not self.overlay_visible
+            ):
+
+                self.overlay.deiconify()
+
+                self.overlay.lift()
+
+                self.overlay_visible = True
+
+            elif (
+                    not is_minimized
+                    and self.overlay_visible
+            ):
+
+                self.overlay.withdraw()
+
+                self.overlay_visible = False
+
+        except Exception as e:
+
+            print(
+                "Overlay Error:",
+                e
+            )
+
+        self.root.after(
+            500,
+            self.monitor_window_state
         )
-
-        self.root.bind(
-            "<Map>",
-            self.on_restore
-        )
-
-    def on_restore(self, event):
-
-        self.overlay.withdraw()
-
-    def on_minimize(self, event):
-
-        if self.root.state() == "iconic":
-            self.overlay.deiconify()
 
     def log(self, message):
 
