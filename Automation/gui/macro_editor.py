@@ -494,9 +494,26 @@ class MacroEditor(ctk.CTkFrame):
 
     def select_click_location(self):
 
+        root = self.winfo_toplevel()
+
+        root.withdraw()
+
+        self.after(
+            300,
+            lambda: self._capture_click_location(root)
+        )
+
+    def _capture_click_location(self, root):
+
         selector = ClickSelector()
 
         result = selector.select()
+
+        root.deiconify()
+
+        root.lift()
+
+        root.focus_force()
 
         if not result:
             return
