@@ -105,20 +105,6 @@ class MainWindow:
             self.monitor_window_state
         )
 
-    def on_restore(self, event):
-
-        self.overlay.withdraw()
-
-    def on_minimize(self, event):
-
-        print("MINIMIZE EVENT")
-
-        print("STATE =", self.root.state())
-
-        if self.root.state() == "iconic":
-            print("SHOWING OVERLAY")
-
-            self.overlay.deiconify()
 
     def log(self, message):
 
@@ -163,6 +149,24 @@ class MainWindow:
         )
 
         self.start_time = None
+
+        self.overlay.status_label.configure(
+            text="⛔ Stopped",
+            text_color="#FF5252"
+        )
+
+        self.overlay.pause_button.configure(
+            text="▶",
+            command=self.run_macro
+        )
+
+        self.overlay.action_label.configure(
+            text="Idle"
+        )
+
+        self.overlay.info_label.configure(
+            text="⏱ 00:00:00 | 0/0"
+        )
 
     def update_action(self, event):
 
@@ -413,6 +417,14 @@ class MainWindow:
 
         self.overlay.withdraw()
 
+        self.overlay.pause_button.configure(
+            command=self.pause_macro
+        )
+
+        self.overlay.stop_button.configure(
+            command=self.stop_macro
+        )
+
     def run_macro(self):
 
         macro = {
@@ -432,7 +444,13 @@ class MainWindow:
         )
 
         self.overlay.status_label.configure(
-            text="✅ Running"
+            text="✅ Running",
+            text_color="#4CAF50"
+        )
+
+        self.overlay.pause_button.configure(
+            text="⏸",
+            command=self.pause_macro
         )
 
     def update_timer(self):
@@ -450,6 +468,10 @@ class MainWindow:
 
         self.timer_var.set(
             f"{hours:02}:{minutes:02}:{seconds:02}"
+        )
+
+        self.overlay.info_label.configure(
+            text=f"⏱ {self.timer_var.get()} | 0/0"
         )
 
         self.root.after(
@@ -473,14 +495,25 @@ class MainWindow:
             "00:00:00"
         )
 
+        self.overlay.info_label.configure(
+            text="⏱ 00:00:00 | 0/0"
+        )
+
         self.start_time = None
+        self.pause_start = None
 
         self.log(
             "Macro Stopped"
         )
 
         self.overlay.status_label.configure(
-            text="⛔ Stopped"
+            text="⛔ Stopped",
+            text_color="#FF5252"
+        )
+
+        self.overlay.pause_button.configure(
+            text="▶",
+            command=self.run_macro
         )
 
     def pause_macro(self):
@@ -493,15 +526,29 @@ class MainWindow:
             "Paused"
         )
 
+        self.overlay.pause_button.configure(
+            text="▶",
+            command=self.resume_macro
+        )
+
         self.overlay.status_label.configure(
-            text="⏸ Paused"
+            text="⏸ Paused",
+            text_color="#FFC107"
         )
 
     def resume_macro(self):
 
-        self.engine.resume()
+        def resume_macro(self):
 
-        if self.pause_start:
+            if self.start_time is None:
+                return
+
+            self.engine.resume()
+
+        if (
+                self.pause_start is not None
+                and self.start_time is not None
+        ):
             paused_time = (
                     time.time()
                     - self.pause_start
@@ -513,6 +560,16 @@ class MainWindow:
 
         self.status_var.set(
             "Running"
+        )
+
+        self.overlay.status_label.configure(
+            text="✅ Running",
+            text_color="#4CAF50"
+        )
+
+        self.overlay.pause_button.configure(
+            text="⏸",
+            command=self.pause_macro
         )
 
     def save_macro(self):
