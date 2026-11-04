@@ -214,6 +214,23 @@ class MacroEditor(ctk.CTkFrame):
 
         self.select_location_btn.pack_forget()
 
+        self.button_label = ctk.CTkLabel(
+            right_frame,
+            text="Mouse Button"
+        )
+
+        self.button_menu = ctk.CTkOptionMenu(
+            right_frame,
+            values=[
+                "left",
+                "right",
+                "middle"
+            ]
+        )
+
+        self.button_label.pack_forget()
+        self.button_menu.pack_forget()
+
         self.value3_label = ctk.CTkLabel(
             right_frame,
             text="Value 3"
@@ -574,6 +591,7 @@ class MacroEditor(ctk.CTkFrame):
         self.events.append(
             {
                 "type": "click",
+                "button": "left",
                 "x": 500,
                 "y": 500,
                 "random_offset": 0
@@ -704,6 +722,9 @@ class MacroEditor(ctk.CTkFrame):
 
         self.select_location_btn.pack_forget()
 
+        self.button_label.pack_forget()
+        self.button_menu.pack_forget()
+
         selection = self.tree.selection()
 
         if not selection:
@@ -779,6 +800,21 @@ class MacroEditor(ctk.CTkFrame):
 
             self.select_location_btn.pack(
                 pady=10
+            )
+
+            self.button_label.pack()
+
+            self.button_menu.pack(
+                fill="x",
+                padx=10,
+                pady=5
+            )
+
+            self.button_menu.set(
+                evt.get(
+                    "button",
+                    "left"
+                )
             )
 
             self.value3_label.configure(
@@ -940,6 +976,10 @@ class MacroEditor(ctk.CTkFrame):
                     self.value2_entry.get()
                 )
 
+                evt["button"] = (
+                    self.button_menu.get()
+                )
+
                 evt["random_offset"] = int(
                     self.value3_entry.get()
                 )
@@ -1097,8 +1137,22 @@ class MacroEditor(ctk.CTkFrame):
 
             if event["type"] == "click":
 
+                button = event.get(
+                    "button",
+                    "left"
+                )
+
+                prefix = {
+                    "left": "L",
+                    "right": "R",
+                    "middle": "M"
+                }.get(
+                    button,
+                    "L"
+                )
+
                 details = (
-                    f"{event['x']},{event['y']}"
+                    f"{prefix}:{event['x']},{event['y']}"
                 )
 
                 offset = event.get(

@@ -92,6 +92,7 @@ class ImagesTab(ctk.CTkFrame):
         #
 
         right_frame = ctk.CTkFrame(self)
+        right_frame.pack_propagate(False)
 
         right_frame.grid(
             row=1,
@@ -113,18 +114,25 @@ class ImagesTab(ctk.CTkFrame):
         # Image Preview Placeholder
         #
 
-        self.preview_label = ctk.CTkLabel(
-            right_frame,
-            text="No Image Selected",
-            width=250,
-            height=150
+        self.preview_frame = ctk.CTkFrame(
+            right_frame
         )
 
-        self.preview_label.pack(
+        self.preview_frame.pack(
+            fill="both",
             padx=10,
             pady=5
         )
 
+        self.preview_label = ctk.CTkLabel(
+            self.preview_frame,
+            text="No Image Selected"
+        )
+
+        self.preview_label.pack(
+            fill="both",
+            expand=True
+        )
 
         #
         # Image Information
@@ -364,8 +372,23 @@ class ImagesTab(ctk.CTkFrame):
                 text=f"Resolution: {width} x {height}"
             )
 
+            self.update_idletasks()
+
+            preview_width = max(
+                self.preview_frame.winfo_width() - 20,
+                100
+            )
+
+            preview_height = max(
+                self.preview_frame.winfo_height() - 20,
+                100
+            )
+
             img.thumbnail(
-                (250, 150)
+                (
+                    preview_width,
+                    preview_height
+                )
             )
 
             preview = ctk.CTkImage(

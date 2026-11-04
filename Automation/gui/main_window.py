@@ -29,7 +29,7 @@ class MainWindow:
         )
 
         self.root.geometry(
-            "900x700+50+50"
+            "900x750+50+50"
         )
 
         self.bg_image = ctk.CTkImage(
@@ -190,16 +190,18 @@ class MainWindow:
             event_type
         )
 
-        self.root.after(
-            0,
-            lambda:
+        def update_ui():
             self.action_var.set(
                 f"Action: {action_text}"
             )
-        )
 
-        self.overlay.action_label.configure(
-            text=action_text
+            self.overlay.action_label.configure(
+                text=action_text
+            )
+
+        self.root.after(
+            0,
+            update_ui
         )
 
     def build_ui(self):
@@ -538,12 +540,10 @@ class MainWindow:
 
     def resume_macro(self):
 
-        def resume_macro(self):
+        if self.start_time is None:
+            return
 
-            if self.start_time is None:
-                return
-
-            self.engine.resume()
+        self.engine.resume()
 
         if (
                 self.pause_start is not None

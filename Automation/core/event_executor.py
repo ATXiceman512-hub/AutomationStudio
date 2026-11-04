@@ -95,8 +95,11 @@ class EventExecutor:
             pyautogui.click(
                 click_x,
                 click_y,
+                button=event.get(
+                    "button",
+                    "left"
+                )
             )
-
             time.sleep(2)
 
         elif event_type == "double_click":
@@ -210,10 +213,10 @@ class EventExecutor:
                     self.log(
                         f"Image Found -> {event['image']}"
                     )
-
                     break
 
-                time.sleep(0.1)
+                time.sleep(1)
+
 
         elif event_type == "click_image":
 
@@ -222,6 +225,7 @@ class EventExecutor:
             )
 
             if not image_path:
+                self.log("IMAGE PATH NOT FOUND")
                 return
 
             region = self.load_region(

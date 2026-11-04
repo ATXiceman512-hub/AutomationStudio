@@ -76,14 +76,26 @@ class RegionSelector:
             end_x = root.winfo_pointerx()
             end_y = root.winfo_pointery()
 
-            self.result = {
+            width = abs(
+                end_x - start_x
+            )
 
-                "x": min(start_x, end_x),
-                "y": min(start_y, end_y),
+            height = abs(
+                end_y - start_y
+            )
 
-                "width": abs(end_x - start_x),
-                "height": abs(end_y - start_y)
-            }
+            if width < 5 or height < 5:
+
+                self.result = None
+
+            else:
+
+                self.result = {
+                    "x": min(start_x, end_x),
+                    "y": min(start_y, end_y),
+                    "width": width,
+                    "height": height
+                }
 
             print(
                 "REGION CAPTURED:",
