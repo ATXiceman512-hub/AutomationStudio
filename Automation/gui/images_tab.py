@@ -5,6 +5,7 @@ import os
 
 from PIL import Image
 from tkinter import filedialog
+from core.image_analyzer import ImageAnalyzer
 
 
 class ImagesTab(ctk.CTkFrame):
@@ -14,8 +15,9 @@ class ImagesTab(ctk.CTkFrame):
         super().__init__(parent)
 
         self.images = {}
-
         self.load()
+
+        self.analyzer = ImageAnalyzer()
 
         self.build_ui()
 
@@ -91,8 +93,7 @@ class ImagesTab(ctk.CTkFrame):
         # RIGHT PANEL
         #
 
-        right_frame = ctk.CTkFrame(self)
-        right_frame.pack_propagate(False)
+        right_frame = ctk.CTkScrollableFrame(self)
 
         right_frame.grid(
             row=1,
@@ -167,6 +168,50 @@ class ImagesTab(ctk.CTkFrame):
             pady=2
         )
 
+        self.analysis_label = ctk.CTkLabel(
+            right_frame,
+            text="Match Quality: Not Tested",
+            justify="left"
+        )
+
+        self.analysis_label.pack(
+            padx=10,
+            pady=10
+        )
+
+        self.region_label = ctk.CTkLabel(
+            right_frame,
+            text="Analysis Region"
+        )
+
+        self.region_label.pack(
+            pady=(5, 0)
+        )
+
+        regions = self.load_regions()
+
+        region_values = [
+            "Entire Screen"
+        ]
+
+        region_values.extend(
+            regions.keys()
+        )
+
+        self.region_combo = ctk.CTkComboBox(
+            right_frame,
+            values=region_values
+        )
+
+        self.region_combo.pack(
+            padx=10,
+            pady=5
+        )
+
+        self.region_combo.set(
+            "Entire Screen"
+        )
+
         #
         # Actions
         #
@@ -203,6 +248,15 @@ class ImagesTab(ctk.CTkFrame):
             buttons_frame,
             text="🔄 Replace Image",
             command=self.replace_image
+        ).pack(
+            fill="x",
+            pady=2
+        )
+
+        ctk.CTkButton(
+            buttons_frame,
+            text="🔍 Analyze Match",
+            command=self.analyze_match
         ).pack(
             fill="x",
             pady=2
@@ -425,3 +479,116 @@ class ImagesTab(ctk.CTkFrame):
         except:
 
             self.images = {}
+
+    def load_regions(self):
+        try:
+            with open(
+                    "regions.json",
+                    "r"
+            ) as f:
+                return json.load(f)
+        except:
+            return {}
+
+    def analyze_match(self):
+
+        selection = self.image_list.curselection()
+
+        if not selection:
+            return
+
+        alias = self.image_list.get(
+            selection[0]
+        )
+
+        image_path = self.images.get(
+            alias
+        )
+
+        regions = self.load_regions()
+
+        region_name = (
+            self.region_combo.get()
+        )
+
+        region = None
+
+        if (
+                region_name
+                != "Entire Screen"
+        ):
+            region = regions.get(
+                region_name
+            )
+
+        confidence = self.analyzer.analyze(
+            image_path,
+            region
+        )
+
+        if confidence is None:
+            self.analysis_label.configure(
+                text=
+                "❌ Unable to analyze image"
+            )
+
+            return
+
+        if confidence >= 0.90:
+            status = "✅ Excellent"
+
+        elif confidence >= 0.75:
+            status = "✅ Good"
+
+        elif confidence >= 0.60:
+            status = "⚠ Acceptable"
+
+        elif confidence >= 0.40:
+            status = "⚠ Weak"
+
+        else:
+            status = "❌ Replace Image"
+
+        recommended_threshold = max(
+            0.40,
+            round(
+                confidence - 0.05,
+                2
+            )
+        )
+
+        if confidence < 0.40:
+
+            recommendation = (
+                "Replace image.\n"
+                "Match quality extremely poor."
+            )
+
+        elif confidence < 0.60:
+
+            recommendation = (
+                "Capture more context.\n"
+                "Include slot borders."
+            )
+
+        elif confidence < 0.75:
+
+            recommendation = (
+                "Usable but may miss detections."
+            )
+
+        else:
+
+            recommendation = (
+                "Image quality acceptable."
+            )
+
+        self.analysis_label.configure(
+
+            text=
+            f"Confidence: {confidence:.3f}\n\n"
+            f"{status}\n\n"
+            f"Recommended Threshold: "
+            f"{recommended_threshold}\n\n"
+            f"{recommendation}"
+        )

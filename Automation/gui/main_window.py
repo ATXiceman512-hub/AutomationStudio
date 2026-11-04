@@ -28,9 +28,7 @@ class MainWindow:
             "Automation Studio"
         )
 
-        self.root.geometry(
-            "900x750+50+50"
-        )
+        self.root.state("zoomed")
 
         self.bg_image = ctk.CTkImage(
             light_image=Image.open(
@@ -359,7 +357,7 @@ class MainWindow:
 
         self.log_box = ctk.CTkTextbox(
             self.root,
-            height=120
+            height=50
         )
 
         self.log_box.pack(
