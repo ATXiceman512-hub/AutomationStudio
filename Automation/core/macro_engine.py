@@ -57,10 +57,43 @@ class MacroEngine:
 
                     time.sleep(0.1)
 
-                if self.on_action:
-                    self.on_action(event)
+                try:
 
-                self.executor.execute(event)
+                    if self.on_action:
+                        self.on_action(event)
+
+                except Exception as e:
+
+                    print(
+                        "ACTION CALLBACK ERROR:",
+                        e
+                    )
+
+                print(
+                    "EXECUTING EVENT:",
+                    event
+                )
+
+                try:
+
+                    self.executor.execute(
+                        event
+                    )
+
+                except Exception as e:
+
+                    print(
+                        "EXECUTOR ERROR:",
+                        e
+                    )
+
+                    import traceback
+
+                    traceback.print_exc()
+
+                print(
+                    "EVENT COMPLETE"
+                )
 
         self.running = False
 

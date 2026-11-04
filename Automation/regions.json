@@ -4,5 +4,11 @@
         "y": 1012,
         "width": 50,
         "height": 50
+    },
+    "first_invent_spot": {
+        "x": 999,
+        "y": 887,
+        "width": 47,
+        "height": 41
     }
 }
